@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Find The Real BIBUS</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      position: relative;
+      height: 100vh;
+      width: 100vw;
+      background-color: #fff5f8;
+      background-image: url('hello2.jpg');
+      background-size: cover;                 
+      background-position: center;            
+      background-repeat: no-repeat;
+    }
+
+    .image-container {
+      position: absolute;
+      cursor: pointer;
+      transition: all 1s ease; /* Smooth movement */
+    }
+
+    .image-container img {
+      width: 80px;
+      height: auto;
+      transition: opacity 0.3s ease;
+    }
+
+    .image-container img.disappear {
+      opacity: 0;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+<script>
+  const totalImages = 20;
+  const imageSize = 80;
+  const padding = 10;
+  const correctIndex = Math.floor(Math.random() * totalImages);
+  const placedRects = [];
+  const speed = 2000; // Time in ms to wait before moving an image again (2 seconds)
+
+  function doesOverlap(x, y) {
+    return placedRects.some(rect => {
+      return (
+        x < rect.x + imageSize + padding &&
+        x + imageSize + padding > rect.x &&
+        y < rect.y + imageSize + padding &&
+        y + imageSize + padding > rect.y
+      );
+    });
+  }
+
+  function getSafePosition() {
+    let x, y, attempts = 0;
+    do {
+      x = Math.floor(Math.random() * (window.innerWidth - imageSize));
+      y = Math.floor(Math.random() * (window.innerHeight - imageSize));
+      attempts++;
+      if (attempts > 500) break; // avoid infinite loop
+    } while (doesOverlap(x, y));
+    placedRects.push({ x, y });
+    return { x, y };
+  }
+
+  // Function to move images randomly every few seconds
+  function moveImage(container) {
+    setInterval(() => {
+      const newX = Math.floor(Math.random() * (window.innerWidth - imageSize));
+      const newY = Math.floor(Math.random() * (window.innerHeight - imageSize));
+      container.style.left = `${newX}px`;
+      container.style.top = `${newY}px`;
+    }, speed);
+  }
+
+  for (let i = 0; i < totalImages; i++) {
+    const container = document.createElement('div');
+    container.classList.add('image-container');
+
+    const { x, y } = getSafePosition();
+    container.style.left = `${x}px`;
+    container.style.top = `${y}px`;
+
+    const img = document.createElement('img');
+    img.src = 'button.png';
+
+    if (i === correctIndex) {
+      const link = document.createElement('a');
+      link.href = '3.htm';
+      link.appendChild(img);
+      container.appendChild(link);
+    } else {
+      img.addEventListener('click', () => {
+        img.classList.add('disappear');
+      });
+      container.appendChild(img);
+    }
+
+    // Start moving images randomly
+    moveImage(container);
+
+    document.body.appendChild(container);
+  }
+</script>
+
+</body>
+</html>
